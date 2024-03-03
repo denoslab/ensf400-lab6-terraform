@@ -10,7 +10,7 @@ create a simulated environment of AWS services.
 ## Environment
 
 ### Set Up Your GitHub CodeSpaces Instance
-Same as Lab 5, this labs will be performed in [GitHub CodeSpaces](https://github.com/codespaces). Create an instance using GitHub Codespaces. Choose repository \texttt{denoslab/ensf400-lab6-terraform}.
+Same as Lab 5, this labs will be performed in [GitHub CodeSpaces](https://github.com/codespaces). Create an instance using GitHub Codespaces. Choose repository `denoslab/ensf400-lab6-terraform`.
 
 ### Install LocalStack
 
