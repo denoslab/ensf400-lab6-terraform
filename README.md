@@ -280,7 +280,198 @@ $ awslocal s3 ls
 2024-03-03 05:05:28 my-bucket2
 ```
 
-## Example 2 - API Gateway DynamoDB
+### Example 2 - Creating a Static Website 
+
+We will create a simple static website using plain HTML to get started. To create a static website deployed over S3, we need to create an index document and a custom error document. We will name our index document index.html and our error document error.html. Optionally, you can create a folder called assets to store images and other assets.
+
+Let’s go to the directory `s3-static-website` where we’ll store our static website files. Create an `index.html` file in the `www` sub directory:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" />
+    <meta  charset="utf-8"  />
+    <title>Static Website</title>
+  </head>
+  <body>
+    <p>Static Website deployed locally over S3 using LocalStack</p>
+  </body>
+</html>
+```
+
+S3 will serve this file when a user visits the root URL of your static website, serving as the default page. In a similar fashion, we can configure a custom error document that contains a user-friendly error message. Let’s create a file named `error.html` and add the following code:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>404</title>
+  </head>
+  <body>
+    <p>Something is amiss.</p>
+  </body>
+</html>
+```
+
+With the provider configured, we can now configure the variables for our S3 bucket. Create a new file named `variables.tf` and add the following code:
+
+```tf
+# Input variable definitions
+
+variable "bucket_name" {
+  description = "Name of the s3 bucket. Must be unique."
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to set on the bucket."
+  type        = map(string)
+  default     = {}
+}
+
+```
+
+We take a user input for the bucket name and tags. Next, we will define the output variables for our Terraform configuration. Create a new file named `outputs.tf` and add the following code:
+
+```tf
+# Output variable definitions
+
+output "arn" {
+  description = "ARN of the bucket"
+  value       = aws_s3_bucket.s3_bucket.arn
+}
+
+output "name" {
+  description = "Name (id) of the bucket"
+  value       = aws_s3_bucket.s3_bucket.id
+}
+
+output "domain" {
+  description = "Domain name of the bucket"
+  value       = aws_s3_bucket_website_configuration.s3_bucket.website_domain
+}
+
+output "website_endpoint" {
+  value = aws_s3_bucket_website_configuration.s3_bucket.website_endpoint
+}
+
+```
+
+The output variables are the ARN, name, domain name, and website endpoint of the bucket. With all the configuration files in place, we can now create the S3 bucket. Create a new file named `main.tf` and create the S3 bucket using the following code:
+
+```tf
+resource "aws_s3_bucket" "s3_bucket" {
+  bucket = var.bucket_name
+  tags   = var.tags
+}
+
+```
+
+To configure the static website hosting, we will use the `aws_s3_bucket_website_configuration` resource. Add the following code to the `main.tf` file:
+
+```tf
+resource "aws_s3_bucket_website_configuration" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+
+}
+```
+
+To set the bucket policy, we will use the `aws_s3_bucket_policy` resource. Add the following code to the `main.tf` file:
+
+```tf
+resource "aws_s3_bucket_acl" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_policy" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource = [
+          aws_s3_bucket.s3_bucket.arn,
+          "${aws_s3_bucket.s3_bucket.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+```
+
+In the above code, we are setting the ACL of the bucket to `public-read` and setting the bucket policy to allow public access to the bucket. Let’s use the `aws_s3_object` resource to upload the files to the bucket. Add the following code to the `main.tf` file:
+
+```tf
+resource "aws_s3_object" "object_www" {
+  depends_on   = [aws_s3_bucket.s3_bucket]
+  for_each     = fileset("${path.root}", "www/*.html")
+  bucket       = var.bucket_name
+  key          = basename(each.value)
+  source       = each.value
+  etag         = filemd5("${each.value}")
+  content_type = "text/html"
+  acl          = "public-read"
+}
+```
+
+The above code uploads all our html files to the bucket. We are also setting the ACL of the files to `public-read`.
+
+With all the configuration files in place, we can now initialize the Terraform configuration. Run the following command to initialize the Terraform configuration:
+
+```bash
+$ tflocal init
+
+...
+Terraform has been successfully initialized!
+...
+```
+
+We can create an execution plan based on our Terraform configuration for the AWS resources. Run the following command to create an execution plan:
+
+```bash
+$ tflocal plan
+```
+
+Finally, we can apply the Terraform configuration to create the AWS resources. Run the following command to apply the Terraform configuration:
+
+```bash
+$ tflocal apply
+
+var.bucket_name
+  Name of the s3 bucket. Must be unique.
+
+  Enter a value: testbucket
+...
+arn = "arn:aws:s3:::testbucket"
+domain = "s3-website-us-east-1.amazonaws.com"
+name = "testbucket"
+website_endpoint = "testbucket.s3-website-us-east-1.amazonaws.com"
+```
+
+In the above command, we specified `testbucket` as the bucket name. You can specify any bucket name since LocalStack is ephemeral, and stopping your LocalStack container will delete all the created resources. The above command output includes the ARN, name, domain name, and website endpoint of the bucket. You can see the website_endpoint configured to use AWS S3 Website Endpoint. You can now access the website using the bucket name `testbucket` in the following format: 
+```bash
+curl http://testbucket.s3-website.localhost.localstack.cloud:4566
+```
+
+Since the endpoint is configured to use `localhost.localstack.cloud`, no real AWS resources have been created.
+
+## Example 3 - API Gateway DynamoDB
 
 This example will create an AWS API Gateway with a DynamoDB backend. Here is the [source](https://github.com/localstack-samples/localstack-terraform-samples/tree/master/apigateway-dynamodb) of this example.
 
@@ -327,5 +518,8 @@ curl -H "x-api-key: ${APIKEY}" --request GET ${RESTAPI}.execute-api.localhost.lo
 {"pets": [{"id": "fd67ab41", "PetType": "dog", "PetName": "tito", "PetPrice": "250"}]}
 ```
 
-
-
+## Have Your Work Checked By a TA
+The TA will check the completion of the following tasks:
+- Output of Example 1.
+- Output of Example 2.
+- Output of Example 3.
