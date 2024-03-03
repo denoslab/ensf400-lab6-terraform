@@ -284,7 +284,7 @@ $ awslocal s3 ls
 
 We will create a simple static website using plain HTML to get started. To create a static website deployed over S3, we need to create an index document and a custom error document. We will name our index document index.html and our error document error.html. Optionally, you can create a folder called assets to store images and other assets.
 
-Let’s go to the directory `s3-static-website` where we’ll store our static website files. Create an `index.html` file in the `www` sub directory:
+Let’s go to the directory `s3-static-website` where we’ll store our static website files. Create an `index.html` file in the `www` sub directory (empty file already created for you):
 
 ```html
 <!DOCTYPE html>
@@ -300,7 +300,7 @@ Let’s go to the directory `s3-static-website` where we’ll store our static w
 </html>
 ```
 
-S3 will serve this file when a user visits the root URL of your static website, serving as the default page. In a similar fashion, we can configure a custom error document that contains a user-friendly error message. Let’s create a file named `error.html` and add the following code:
+S3 will serve this file when a user visits the root URL of your static website, serving as the default page. In a similar fashion, we can configure a custom error document that contains a user-friendly error message. Let’s create a file named `error.html` (empty file already created for you) and add the following code:
 
 ```html
 <!DOCTYPE html>
@@ -315,7 +315,7 @@ S3 will serve this file when a user visits the root URL of your static website, 
 </html>
 ```
 
-With the provider configured, we can now configure the variables for our S3 bucket. Create a new file named `variables.tf` and add the following code:
+With the provider configured, we can now configure the variables for our S3 bucket. Create a new file named `variables.tf` (empty file already created for you) and add the following code:
 
 ```tf
 # Input variable definitions
@@ -333,7 +333,7 @@ variable "tags" {
 
 ```
 
-We take a user input for the bucket name and tags. Next, we will define the output variables for our Terraform configuration. Create a new file named `outputs.tf` and add the following code:
+We take a user input for the bucket name and tags. Next, we will define the output variables for our Terraform configuration. Create a new file named `outputs.tf` (empty file already created for you) and add the following code:
 
 ```tf
 # Output variable definitions
@@ -359,7 +359,7 @@ output "website_endpoint" {
 
 ```
 
-The output variables are the ARN, name, domain name, and website endpoint of the bucket. With all the configuration files in place, we can now create the S3 bucket. Create a new file named `main.tf` and create the S3 bucket using the following code:
+The output variables are the ARN, name, domain name, and website endpoint of the bucket. With all the configuration files in place, we can now create the S3 bucket. Create a new file named `main.tf` (empty file already created for you) and create the S3 bucket using the following code:
 
 ```tf
 resource "aws_s3_bucket" "s3_bucket" {
