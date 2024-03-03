@@ -280,7 +280,7 @@ $ awslocal s3 ls
 2024-03-03 05:05:28 my-bucket2
 ```
 
-### Example 2 - Creating a Static Website 
+## Example 2 - Creating a Static Website 
 
 We will create a simple static website using plain HTML to get started. To create a static website deployed over S3, we need to create an index document and a custom error document. We will name our index document index.html and our error document error.html. Optionally, you can create a folder called assets to store images and other assets.
 
