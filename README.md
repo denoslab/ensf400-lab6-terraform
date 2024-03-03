@@ -451,7 +451,7 @@ $ tflocal plan
 Finally, we can apply the Terraform configuration to create the AWS resources. Run the following command to apply the Terraform configuration:
 
 ```bash
-$ tflocal apply
+$ tflocal apply -auto-approve
 
 var.bucket_name
   Name of the s3 bucket. Must be unique.
@@ -471,6 +471,7 @@ curl http://testbucket.s3-website.localhost.localstack.cloud:4566
 
 Since the endpoint is configured to use `localhost.localstack.cloud`, no real AWS resources have been created.
 
+
 ## Example 3 - API Gateway DynamoDB
 
 This example will create an AWS API Gateway with a DynamoDB backend. Here is the [source](https://github.com/localstack-samples/localstack-terraform-samples/tree/master/apigateway-dynamodb) of this example.
@@ -480,7 +481,7 @@ Go to the `apigateway-dynamodb` directory, then apply Terraform configurations.
 cd apigateway-dynamodb
 tflocal init
 tflocal plan
-tflocal apply --auto-approve
+tflocal apply -auto-approve
 ```
 As we can see, the output will include the API key of the created service and its REST API endpoint:
 
@@ -523,3 +524,10 @@ The TA will check the completion of the following tasks:
 - Output of Example 1.
 - Output of Example 2.
 - Output of Example 3.
+
+## Cleanups
+
+Finally, clean up resources under each working directory created by Terraform:
+```bash
+$ tflocal destroy -auto-approve
+```
