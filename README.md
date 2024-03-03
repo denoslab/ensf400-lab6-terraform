@@ -128,7 +128,7 @@ $ tflocal --help
 Usage: terraform [global options] <subcommand> [args]
 ...
 ```
-## Using Terraform
+## Example 1 - Managing An S3 Bucket
 
 ### List Existing S3 Buckets
 Before we create any configuration using Terraform, first let us list the existing S3 buckets.
@@ -199,7 +199,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 │ 
 │ (and one more similar warning elsewhere)
 ```
-**NOTE:** there is a warning irrelevant to our lab. Ignore the warning as it does not affect out steps.
+**NOTE:** there is a warning irrelevant to our lab. Ignore the warning as it does not affect our steps.
 
 We can now provision the S3 bucket specified in the configuration:
 ```bash
@@ -262,9 +262,70 @@ $ awslocal s3 ls
 ```
 We can see that the bucket has been created as an AWS resource.
 
+Now, change the name of the S3 bucket from `my-bucket` to `my-bucket2` by modifying `main.tf`:
+```tf
+resource "aws_s3_bucket" "test-bucket" {
+  bucket = "my-bucket2"
+}
+```
+Then plan and apply the change again and observe the output.
+```bash
+tflocal plan
+tflocal apply -auto-approve
+```
+Then list the buckets again using the AWS CLI:
 
+```bash
+$ awslocal s3 ls
+2024-03-03 05:05:28 my-bucket2
+```
 
+## Example 2 - API Gateway DynamoDB
 
+This example will create an AWS API Gateway with a DynamoDB backend. Here is the [source](https://github.com/localstack-samples/localstack-terraform-samples/tree/master/apigateway-dynamodb) of this example.
+
+Go to the `apigateway-dynamodb` directory, then apply Terraform configurations.
+```bash
+cd apigateway-dynamodb
+tflocal init
+tflocal plan
+tflocal apply --auto-approve
+```
+As we can see, the output will include the API key of the created service and its REST API endpoint:
+
+```bash
+Apply complete! Resources: 16 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+apigw_endpoint = "https://leycl5nd00.execute-api.us-east-1.amazonaws.com/v1/pets"
+apigw_key = "1UA2BJMkLoV7cyTnG3Xxzjr9QYt8gWdKNibm6lhs"
+```
+
+Now, we will store the API key of the service and only the first part of the REST API endpoint for accessing the LocalStack service:
+```bash
+APIKEY=$(tflocal output -json | jq -r .apigw_key.value)
+echo $APIKEY
+1UA2BJMkLoV7cyTnG3Xxzjr9QYt8gWdKNibm6lhs
+```
+
+```bash
+RESTAPI=$(awslocal apigateway get-rest-apis | jq -r .items[0].id)
+echo $RESTAPI
+leycl5nd00
+```
+
+Next, use these two variables to create a data record:
+```bash
+curl ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets -H "x-api-key: ${APIKEY}" -H 'Content-Type: application/json' --request POST --data-raw '{ "PetType": "dog", "PetName": "tito", "PetPrice": 250 }'
+{}
+```
+
+Finally, verify the creation of the record by querying it:
+```bash
+curl -H "x-api-key: ${APIKEY}" --request GET ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets/dog
+{"pets": [{"id": "fd67ab41", "PetType": "dog", "PetName": "tito", "PetPrice": "250"}]}
+```
 
 
 
