@@ -17,11 +17,11 @@ Same as Lab 5, this labs will be performed in [GitHub CodeSpaces](https://github
 We will use PyPI to install LocalStack. Full installation guide can be found [here](https://github.com/localstack/localstack?tab=readme-ov-file#installation).
 
 ```bash
-pip install localstack
+$ pip install localstack
 ```
 After installation, start LocalStack inside a Docker container by running:
 ```bash
- % localstack start -d
+$ localstack start -d
 
      __                     _______ __             __
     / /   ____  _________ _/ / ___// /_____ ______/ /__
@@ -40,7 +40,7 @@ After installation, start LocalStack inside a Docker container by running:
 ```
 You can query the status of respective services on LocalStack by running:
 ```bash
-% localstack status services
+$ localstack status services
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ Service                  ┃ Status      ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
@@ -57,7 +57,7 @@ You can query the status of respective services on LocalStack by running:
 Now that we have LocalStack installed, the next step is to install the AWS CLI along with the LocalStack wrapper.
 
 ```bash
-pip install awscli-local[ver1]
+$ pip install awscli-local[ver1]
 ```
 Check if `awslocal` command can correctly run. The following output is expected.
 ```bash
@@ -90,23 +90,7 @@ Type `terraform` to see if Terraform can run correctly. You should see output li
 ```bash
 $ terraform
 Usage: terraform [global options] <subcommand> [args]
-
-The available commands for execution are listed below.
-The primary workflow commands are given first, followed by
-less common or more advanced commands.
-
-Main commands:
-  init          Prepare your working directory for other commands
-  validate      Check whether the configuration is valid
-  plan          Show changes required by the current configuration
-  apply         Create or update infrastructure
-  destroy       Destroy previously-created infrastructure
 ...
-Global options (use these before the subcommand, if any):
-  -chdir=DIR    Switch to a different working directory before executing the
-                given subcommand.
-  -help         Show this help output, or the help for a specified subcommand.
-  -version      An alias for the "version" subcommand.
 ```
 
 
@@ -119,7 +103,7 @@ LocalStack supports Terraform via the AWS provider through custom service endpoi
 
 To install the `tflocal` command, we will use PyPI:
 ```bash
-pip install terraform-local
+$ pip install terraform-local
 ```
 
 After installation, we can use the `tflocal` command, which has the same interface as the terraform command line.
@@ -152,7 +136,7 @@ resource "aws_s3_bucket" "test-bucket" {
 ```
 Initialize Terraform using the following command:
 ```bash
-tflocal init
+$ tflocal init
 ```
 
 Dry-run the configuration to see what will be changed:
@@ -163,27 +147,7 @@ Terraform used the selected providers to generate the following execution plan. 
   + create
 
 Terraform will perform the following actions:
-
-  # aws_s3_bucket.test-bucket will be created
-  + resource "aws_s3_bucket" "test-bucket" {
-      + acceleration_status         = (known after apply)
-      + acl                         = (known after apply)
-      + arn                         = (known after apply)
-      + bucket                      = "my-bucket"
-      + bucket_domain_name          = (known after apply)
-      + bucket_prefix               = (known after apply)
-      + bucket_regional_domain_name = (known after apply)
-      + force_destroy               = false
-      + hosted_zone_id              = (known after apply)
-      + id                          = (known after apply)
-      + object_lock_enabled         = (known after apply)
-      + policy                      = (known after apply)
-      + region                      = (known after apply)
-      + request_payer               = (known after apply)
-      + tags_all                    = (known after apply)
-      + website_domain              = (known after apply)
-      + website_endpoint            = (known after apply)
-    }
+...
 
 Plan: 1 to add, 0 to change, 0 to destroy.
 ╷
@@ -209,42 +173,10 @@ Terraform used the selected providers to generate the following execution plan. 
   + create
 
 Terraform will perform the following actions:
-
-  # aws_s3_bucket.test-bucket will be created
-  + resource "aws_s3_bucket" "test-bucket" {
-      + acceleration_status         = (known after apply)
-      + acl                         = (known after apply)
-      + arn                         = (known after apply)
-      + bucket                      = "my-bucket"
-      + bucket_domain_name          = (known after apply)
-      + bucket_prefix               = (known after apply)
-      + bucket_regional_domain_name = (known after apply)
-      + force_destroy               = false
-      + hosted_zone_id              = (known after apply)
-      + id                          = (known after apply)
-      + object_lock_enabled         = (known after apply)
-      + policy                      = (known after apply)
-      + region                      = (known after apply)
-      + request_payer               = (known after apply)
-      + tags_all                    = (known after apply)
-      + website_domain              = (known after apply)
-      + website_endpoint            = (known after apply)
-    }
+...
 
 Plan: 1 to add, 0 to change, 0 to destroy.
-╷
-│ Warning: Invalid Attribute Combination
-│ 
-│   with provider["registry.terraform.io/hashicorp/aws"],
-│   on localstack_providers_override.tf line 2, in provider "aws":
-│    2: provider "aws" {
-│ 
-│ Only one of the following attributes should be set: "endpoints[0].configservice", "endpoints[0].config"
-│ 
-│ This will be an error in a future release.
-│ 
-│ (and one more similar warning elsewhere)
-╵
+...
 
 Do you want to perform these actions?
   Terraform will perform the actions described above.
@@ -284,7 +216,12 @@ $ awslocal s3 ls
 
 We will create a simple static website using plain HTML to get started. To create a static website deployed over S3, we need to create an index document and a custom error document. We will name our index document index.html and our error document error.html. Optionally, you can create a folder called assets to store images and other assets.
 
-Let’s go to the directory `s3-static-website` where we’ll store our static website files. Create an `index.html` file in the `www` sub directory (empty file already created for you):
+Let’s go to the directory `s3-static-website` where we’ll store our static website files.
+```bash
+$ cd /workspaces/ensf400-lab6-terraform/s3-static-website
+```
+
+Create an `index.html` file in the `www` sub directory (empty file already created for you):
 
 ```html
 <!DOCTYPE html>
@@ -466,7 +403,7 @@ website_endpoint = "testbucket.s3-website-us-east-1.amazonaws.com"
 
 In the above command, we specified `testbucket` as the bucket name. You can specify any bucket name since LocalStack is ephemeral, and stopping your LocalStack container will delete all the created resources. The above command output includes the ARN, name, domain name, and website endpoint of the bucket. You can see the website_endpoint configured to use AWS S3 Website Endpoint. You can now access the website using the bucket name `testbucket` in the following format: 
 ```bash
-curl http://testbucket.s3-website.localhost.localstack.cloud:4566
+$ curl http://testbucket.s3-website.localhost.localstack.cloud:4566
 ```
 
 Since the endpoint is configured to use `localhost.localstack.cloud`, no real AWS resources have been created.
@@ -478,10 +415,10 @@ This example will create an AWS API Gateway with a DynamoDB backend. Here is the
 
 Go to the `apigateway-dynamodb` directory, then apply Terraform configurations.
 ```bash
-cd apigateway-dynamodb
-tflocal init
-tflocal plan
-tflocal apply -auto-approve
+$ cd /workspaces/ensf400-lab6-terraform/apigateway-dynamodb
+$ tflocal init
+$ tflocal plan
+$ tflocal apply -auto-approve
 ```
 As we can see, the output will include the API key of the created service and its REST API endpoint:
 
@@ -496,26 +433,31 @@ apigw_key = "1UA2BJMkLoV7cyTnG3Xxzjr9QYt8gWdKNibm6lhs"
 
 Now, we will store the API key of the service and only the first part of the REST API endpoint for accessing the LocalStack service:
 ```bash
-APIKEY=$(tflocal output -json | jq -r .apigw_key.value)
-echo $APIKEY
+$ APIKEY=$(tflocal output -json | jq -r .apigw_key.value)
+$ echo $APIKEY
+
 1UA2BJMkLoV7cyTnG3Xxzjr9QYt8gWdKNibm6lhs
 ```
 
 ```bash
-RESTAPI=$(awslocal apigateway get-rest-apis | jq -r .items[0].id)
-echo $RESTAPI
+$ RESTAPI=$(awslocal apigateway get-rest-apis | jq -r .items[0].id)
+$ echo $RESTAPI
+
 leycl5nd00
 ```
+The values above will be different since each time the API key and the endpoint will be generated randomly.
 
 Next, use these two variables to create a data record:
 ```bash
-curl ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets -H "x-api-key: ${APIKEY}" -H 'Content-Type: application/json' --request POST --data-raw '{ "PetType": "dog", "PetName": "tito", "PetPrice": 250 }'
+$ curl ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets -H "x-api-key: ${APIKEY}" -H 'Content-Type: application/json' --request POST --data-raw '{ "PetType": "dog", "PetName": "tito", "PetPrice": 250 }'
+
 {}
 ```
 
 Finally, verify the creation of the record by querying it:
 ```bash
-curl -H "x-api-key: ${APIKEY}" --request GET ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets/dog
+$ curl -H "x-api-key: ${APIKEY}" --request GET ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets/dog
+
 {"pets": [{"id": "fd67ab41", "PetType": "dog", "PetName": "tito", "PetPrice": "250"}]}
 ```
 
@@ -529,5 +471,10 @@ The TA will check the completion of the following tasks:
 
 Finally, clean up resources under each working directory created by Terraform:
 ```bash
+$ cd /workspaces/ensf400-lab6-terraform
+$ tflocal destroy -auto-approve
+$ cd /workspaces/ensf400-lab6-terraform/s3-static-website
+$ tflocal destroy -auto-approve
+$ cd /workspaces/ensf400-lab6-terraform/apigateway-dynamodb
 $ tflocal destroy -auto-approve
 ```
