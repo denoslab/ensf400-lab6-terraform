@@ -481,12 +481,12 @@ The TA will check the completion of the following tasks:
 
 Each member of the group should be able to answer all of the following questions. The TA will ask each person one question selected at random, and the student must be able to answer the question to get credit for the lab.
 
-Q1: Modify Example 2 so that the aws_s3_object has the constant bucket name of "practice_bucket". 
-Q2: In Example 2, what should we change if the website’s default page has its name changed to “web.html”? 
-Q3: In Example 2, how do we automatically set “bucket_name” instead of inputting it manually in the command line?
-Q4: Is there a table defined in Example 3’s DynamoDB? If so, What is the structure like for the table?
-Q5: For Example 3, why is the APIKey different every time?
-Q6: In Example 1, what happens to the existing bucket when we change the bucket name? Will the data in the existing bucket be lost?
+- Q1: Modify Example 2 so that the aws_s3_object has the constant bucket name of "practice_bucket". 
+- Q2: In Example 2, what should we change if the website’s default page has its name changed to “web.html”? 
+- Q3: In Example 2, how do we automatically set “bucket_name” instead of inputting it manually in the command line?
+- Q4: Is there a table defined in Example 3’s DynamoDB? If so, What is the structure like for the table?
+- Q5: For Example 3, why is the APIKey different every time?
+- Q6: In Example 1, what happens to the existing bucket when we change the bucket name? Will the data in the existing bucket be lost?
  
 
 ## Cleanups
