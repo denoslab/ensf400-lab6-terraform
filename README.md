@@ -82,7 +82,11 @@ Run the following command on your CodeSpaces instance.
 
 ```bash
 $ wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+```
+```bash
 $ echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+```
+```bash
 $ sudo apt update && sudo apt install terraform
 ```
 Type `terraform` to see if Terraform can run correctly. You should see output like this.
@@ -252,7 +256,7 @@ S3 will serve this file when a user visits the root URL of your static website, 
 </html>
 ```
 
-With the provider configured, we can now configure the variables for our S3 bucket. Create a new file named `variables.tf` (empty file already created for you) and add the following code:
+With the provider configured, we can now configure the variables for our S3 bucket. Go back to the `s3-static-website` directory. Create a new file named `variables.tf` (empty file already created for you) and add the following code:
 
 ```tf
 # Input variable definitions
@@ -270,7 +274,7 @@ variable "tags" {
 
 ```
 
-We take a user input for the bucket name and tags. Next, we will define the output variables for our Terraform configuration. Create a new file named `outputs.tf` (empty file already created for you) and add the following code:
+We take user input for the bucket name and tags. Next, we will define the output variables for our Terraform configuration. Create a new file named `outputs.tf` (empty file already created for you) and add the following code:
 
 ```tf
 # Output variable definitions
@@ -435,14 +439,18 @@ Now, we will store the API key of the service and only the first part of the RES
 ```bash
 $ APIKEY=$(tflocal output -json | jq -r .apigw_key.value)
 $ echo $APIKEY
-
+```
+You should see the output like this (API key will be different):
+```bash
 1UA2BJMkLoV7cyTnG3Xxzjr9QYt8gWdKNibm6lhs
 ```
 
 ```bash
 $ RESTAPI=$(awslocal apigateway get-rest-apis | jq -r .items[0].id)
 $ echo $RESTAPI
-
+```
+You should see the output like this:
+```bash
 leycl5nd00
 ```
 The values above will be different since each time the API key and the endpoint will be generated randomly.
@@ -450,14 +458,18 @@ The values above will be different since each time the API key and the endpoint 
 Next, use these two variables to create a data record:
 ```bash
 $ curl ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets -H "x-api-key: ${APIKEY}" -H 'Content-Type: application/json' --request POST --data-raw '{ "PetType": "dog", "PetName": "tito", "PetPrice": 250 }'
-
+```
+You should see the output below indicating the record is created successfully:
+```bash
 {}
 ```
 
 Finally, verify the creation of the record by querying it:
 ```bash
 $ curl -H "x-api-key: ${APIKEY}" --request GET ${RESTAPI}.execute-api.localhost.localstack.cloud:4566/v1/pets/dog
-
+```
+You should see the query result below:
+```bash
 {"pets": [{"id": "fd67ab41", "PetType": "dog", "PetName": "tito", "PetPrice": "250"}]}
 ```
 
